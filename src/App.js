@@ -1,27 +1,31 @@
-// src/App.js
 import React from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import { AnimatePresence } from 'framer-motion';
+import Navbar from './components/Navbar';
+import Home from './pages/Home';
+import About from './pages/About';
+import Projects from './pages/Projects';
 
-import Navbar   from './components/Navbar';
-import Home     from './pages/Home';
-import About    from './pages/About';
-import Projects from './pages/Projects';    // ← new import
-
-function App() {
+function AnimatedRoutes() {
+  const location = useLocation();
   return (
-    <BrowserRouter>
-      <div className="min-h-screen bg-gradient-to-b from-[#4b0f6b] to-[#701f91]">
-        <Navbar />
-
-        <Routes>
-          <Route path="/"         element={<Home />} />
-          <Route path="/about"    element={<About />} />
-          <Route path="/projects" element={<Projects />} />   {/* ← new route */}
-          {/* future pages: /contact, etc. */}
-        </Routes>
-      </div>
-    </BrowserRouter>
+    <AnimatePresence mode="wait">
+      <Routes location={location} key={location.pathname}>
+        <Route path="/"         element={<Home />} />
+        <Route path="/about"    element={<About />} />
+        <Route path="/projects" element={<Projects />} />
+      </Routes>
+    </AnimatePresence>
   );
 }
 
-export default App;
+export default function App() {
+  return (
+    <Router>
+      <div className="min-h-screen bg-gradient-to-b from-[#4b0f6b] to-[#701f91] overflow-x-hidden">
+        <Navbar />
+        <AnimatedRoutes />
+      </div>
+    </Router>
+  );
+}
