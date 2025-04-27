@@ -1,83 +1,71 @@
-// src/components/Navbar.jsx
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import { FaBars, FaTimes } from 'react-icons/fa';
 
-function Navbar() {
+const menuItems = [
+  { to: '/',        label: 'Home'     },
+  { to: '/about',   label: 'About'    },
+  { to: '/projects',label: 'Projects' }
+];
+
+export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
-  const toggleMenu = () => setIsOpen(!isOpen);
-  const closeMenu  = () => setIsOpen(false);
-
-  // menu items array to DRY up code
-  const menu = [
-    { to: '/',      label: 'Home'    },
-    { to: '/about', label: 'About'   },
-    { to: '/projects',label: 'Projects' },
-    // add {to:'/projects',label:'Projects'} etc.
-  ];
-
+  const toggle = () => setIsOpen(o => !o);
   return (
-    <>
-      <nav className="flex items-center justify-between px-6 py-4 text-white">
-        <div className="text-2xl font-bold tracking-wide">
-          <Link to="/" onClick={closeMenu}>Team Portfolio <span className="font-extrabold">TMP</span></Link>
-        </div>
+    <nav className="flex items-center justify-between px-6 py-4 bg-[#3b3160] text-white relative z-20">
+      <Link to="/" onClick={() => setIsOpen(false)}>
+        <h1 className="text-xl font-bold">Team Portfolio TMP</h1>
+      </Link>
 
-        {/* Desktop Menu */}
-        <ul className="hidden md:flex space-x-6">
-          {menu.map(item => (
-            <li key={item.to}>
-              <Link
-                to={item.to}
-                className="hover:text-gray-300"
-              >
-                {item.label}
-              </Link>
-            </li>
-          ))}
-        </ul>
+      {/* Desktop Links */}
+      <ul className="hidden md:flex space-x-6">
+        {menuItems.map(i => (
+          <motion.li 
+            key={i.to}
+            whileTap={{ scale: 0.95 }}
+            whileHover={{ scale: 1.05 }}
+            transition={{ type: 'spring', stiffness: 300 }}
+          >
+            <Link to={i.to}>{i.label}</Link>
+          </motion.li>
+        ))}
+      </ul>
 
-        {/* Mobile Hamburger */}
-        <div className="md:hidden" onClick={toggleMenu}>
-          <FaBars className="text-2xl cursor-pointer" />
-        </div>
-      </nav>
-
-      {/* Overlay */}
-      {isOpen && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-10"
-          onClick={closeMenu}
-        />
-      )}
-
-      {/* Side Panel */}
-      <div
-        className={`
-          fixed top-0 right-0 h-screen w-64 bg-[#4b0f6b]
-          transform transition-transform duration-300 z-20
-          ${isOpen ? 'translate-x-0' : 'translate-x-full'}
-        `}
+      {/* Mobile Hamburger */}
+      <motion.button
+        className="md:hidden"
+        onClick={toggle}
+        whileTap={{ scale: 0.8 }}
       >
-        <button className="flex justify-end p-4 text-white" onClick={closeMenu}>
-          <FaTimes className="text-2xl" />
-        </button>
-        <ul className="flex flex-col px-4 text-white space-y-4">
-          {menu.map(item => (
-            <li key={item.to}>
-              <Link
-                to={item.to}
-                className="hover:text-gray-300 block"
-                onClick={closeMenu}
+        {isOpen ? <FaTimes size={24}/> : <FaBars size={24}/>}
+      </motion.button>
+
+      {/* Mobile Menu */}
+      <AnimatePresence>
+        {isOpen && (
+          <motion.ul
+            initial={{ x: 200, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            exit={{ x: 200, opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="fixed top-16 right-4 w-48 bg-[#4b0f6b] p-4 rounded-lg shadow-lg flex flex-col space-y-3"
+          >
+            {menuItems.map(i => (
+              <motion.li
+                key={i.to}
+                whileTap={{ scale: 0.95 }}
+                whileHover={{ scale: 1.05 }}
+                transition={{ type: 'spring', stiffness: 300 }}
               >
-                {item.label}
-              </Link>
-            </li>
-          ))}
-        </ul>
-      </div>
-    </>
+                <Link to={i.to} onClick={() => setIsOpen(false)}>
+                  {i.label}
+                </Link>
+              </motion.li>
+            ))}
+          </motion.ul>
+        )}
+      </AnimatePresence>
+    </nav>
   );
 }
-
-export default Navbar;
